@@ -1,0 +1,47 @@
+#! /bin/env bash
+# ╔═╗ ╔╗╔═══╗╔═══╗╔═══╗╔══╗
+# ║║╚╗║║║╔═╗║║╔═╗║║╔═╗║╚╣╠╝
+# ║╔╗╚╝║║╚═╝║║╚══╗║╚══╗ ║║
+# ║║╚╗║║║╔╗╔╝╚══╗║╚══╗║ ║║  N R Shyamsundar Iyanger
+# ║║ ║║║║║║╚╗║╚═╝║║╚═╝║╔╣╠╗ nrshyamsundariyanger@protonmail.com
+# ╚╝ ╚═╝╚╝╚═╝╚═══╝╚═══╝╚══╝
+
+# Script emulates a pomodoro
+# Dependencies :
+#       python plasound module
+#       notify-send
+
+# Work time in minutes
+worktime=25
+# Break time in minutes
+breaktime=5
+pom_count=0;
+
+# function takes in no parameters will play the mp3 file as notification sound
+function notification {
+  python -c $'import os, playsound \n
+path=os.getenv(\'HOME\')+\'/.bin/onichan_message.mp3\' \n
+playsound.playsound(path)'
+}
+
+# The main driver function
+function main {
+  while true
+  do
+    if [ $pom_count -eq 3 ]
+    then
+      notify-send "Pomodoro finished";
+      notification;
+      exit;
+    fi
+    notify-send "Work time" -t $(( $worktime * 6000 ));
+    notification;
+    sleep $(( $worktime*60 ));
+    notify-send "Break time" -t $(( $breaktime * 6000 ));
+    notification;
+    sleep $(( $breaktime*60 ));
+    expr $(( pom_count++ ));
+  done
+}
+# The driver function call
+main @$

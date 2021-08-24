@@ -1,0 +1,91 @@
+#!/bin/env bash
+#
+# ╔═╗ ╔╗╔═══╗╔═══╗╔═══╗╔══╗
+# ║║╚╗║║║╔═╗║║╔═╗║║╔═╗║╚╣╠╝
+# ║╔╗╚╝║║╚═╝║║╚══╗║╚══╗ ║║
+# ║║╚╗║║║╔╗╔╝╚══╗║╚══╗║ ║║
+# ║║ ║║║║║║╚╗║╚═╝║║╚═╝║╔╣╠╗ github.com/nrssi
+# ╚╝ ╚═╝╚╝╚═╝╚═══╝╚═══╝╚══╝ nrshyamsundariyanger@protonmail.com
+#
+# Script provides a REPL for interacting with bandit game from overthewire.org
+
+# set this to your default terminal emulator
+terminal="alacritty"
+# file where passwords will be stored (database)
+keyfile="$HOME/war-games/bandit"
+
+# Adds the given string (specifically password ) to database
+function add {
+  number=$(cat $HOME/war-games/bandit | wc -l);
+  echo "lev$number : $1" >> $HOME/war-games/bandit;
+}
+#
+# Shows all the passwords available now.
+function show {
+  cat $keyfile;
+}
+#
+# Pastes the last levels password to clipboard
+function pass {
+  tail $keyfile -n 1 | sed 's/lev[0-9][0-9] : //' | xclip -i -selection c;
+}
+#
+# Helper function to ssh into bandit game
+function log {
+  url="bandit$1@bandit.labs.overthewire.org -p 2220";
+  message="Connecting to bandit.labs.overthewire.org on port 2220 \nas user bandit$1";
+  yad --text="$message" --geometry 100x100;
+  res=$?;
+  if [[ $res -eq 0 ]]
+  then 
+    pass;
+    exec $terminal -e ssh $url ;
+  else
+    yad --text="Operation cancelled by user"
+  fi
+}
+#
+#
+# Prints a help message
+function help {
+cat << EOF
+  This is a REPL script for playing games on overthewire.org
+  usage  :- gamelog
+  COMMANDS
+    add <string>    :- appends the given string to $keyfile,
+    show            :- shows the contents of $keyfile,
+    pass            :- the password necessary for next level is placed on the clipboard,
+    log <level no.> :- ssh's to the given level (password from previous level will be placed on clipboard too,
+    help            :- print this help message
+EOF
+}
+#
+# Driver function for this script
+function main {
+  if [[ ! -f $keyfile ]]
+  then
+    mkdir $HOME/war-games;
+    touch $keyfile;
+  fi
+  # Banner for the script
+  echo "Welcome to overthewire games helper script(Note : this is not an official script) ";
+  echo "Type help if you are new here."
+  declare -a params;
+  # start of REPL (Read Eval Print Loop)
+  while true
+  do
+
+    read -p ">" -a params;
+    case "${params[0]}" in 
+      "show" ) show                                             ;;
+      "help" ) help                                             ;;
+      "pass" ) pass                                             ;;
+      "exit" ) exit 0                                           ;;
+      "clear") clear                                            ;;
+      "log"  ) log "${params[1]}" &                             ;;
+      "add"  ) add "${params[1]}"                               ;;
+      *      ) printf "Unkown command type help for help-text\n";;
+    esac
+  done
+}
+main

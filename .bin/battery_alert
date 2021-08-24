@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+function notification_beep {
+    python -c $'import os, playsound \n
+path=os.getenv(\'HOME\')+\'/.bin/beep.mp3\' \n
+playsound.playsound(path)'
+}
+while true
+do
+    battery_percentage=$(acpi -b | grep -P -o '[0-9]+(?=%)'| sort | tail -1);
+    charger_online=$(acpi -b | grep -c "Charging")
+    if [[ $charger_online -ne 1 ]]
+    then
+        if [[ $battery_percentage -eq 25 ]]
+        then
+            notify-send "Battery Low connect to power supply."
+            notification_beep;
+        fi
+        if [[ $battery_percentage -eq 15 ]]
+        then
+            notify-send "Battery Low connect to power supply."
+            notification_beep;
+        fi
+        if [[ battery_percentage -eq 10 ]]
+        then
+            notify-send "Battery Low connect to power supply."
+            notification_beep;
+        fi
+    fi
+    sleep 60;
+done

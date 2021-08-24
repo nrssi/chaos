@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+# ╔═╗ ╔╗╔═══╗╔═══╗╔═══╗╔══╗
+# ║║╚╗║║║╔═╗║║╔═╗║║╔═╗║╚╣╠╝
+# ║╔╗╚╝║║╚═╝║║╚══╗║╚══╗ ║║
+# ║║╚╗║║║╔╗╔╝╚══╗║╚══╗║ ║║  N R Shyamsundar Iyanger
+# ║║ ║║║║║║╚╗║╚═╝║║╚═╝║╔╣╠╗ nrshyamsundariyanger@protonmail.com
+# ╚╝ ╚═╝╚╝╚═╝╚═══╝╚═══╝╚══╝
+
+# This script is designed to print box or other shapes mentioned in the help menu to stdout.
+#
+# Setting bash to exit if theres any command with non-zero exit status
+set -euo pipefail
+
+# function takes width and height and prints out a box
+box(){
+    column="│";
+    row="─";
+    top_left="┌";
+    top_right="┐";
+    bottom_left="└";
+    bottom_right="┘"
+    X=$1;
+    Y=$2;
+    for((i=0;i<=X;i++))
+    do
+        for((j=0;j<=Y;j++))
+        do
+            if [ $i == 0 ]
+            then
+                if [ $j == 0 ]
+                then
+                    printf "%s" $top_left;
+                elif [ $j == $Y ]
+                then
+                    printf "%s" $top_right;
+                else
+                    printf "%s" $row;
+                fi
+            fi
+            if [ $i == $X ]
+            then
+                if [ $j == 0 ]
+                then
+                    printf "%s" $bottom_left;
+                elif [ $j == $Y ]
+                then
+                    printf "%s" $bottom_right;
+                else
+                    printf "%s" $row;
+                fi
+            fi
+            if [ $i -gt 0 ] && [ $i -lt $X ]
+            then
+                if [ $j == 0 ]
+                then
+                    printf "%s" $column;
+                elif [ $j == $Y ]
+                then
+                    printf "%s" $column;
+                else
+                    printf " ";
+                fi
+            fi
+        done
+        printf "\n";
+    done
+
+}
+
+# function prints out a vertical line to stdout takes length as parameter
+v_line(){
+    length=$1;
+    symbol="│"
+    for((i=0;i<=length;i++))
+    do
+        printf "%s\n" $symbol;
+    done
+}
+
+# function prints out a horizontal line to stdout takes length as parameter
+h_line(){
+    length=$2;
+    type="$1";
+    left_collab="├";
+    right_collab="┤";
+    top_collab="┬";
+    bottom_collab="┴";
+    right_arrow="⮞";
+    left_arrow="⮜";
+    top_arrow="⮝";
+    bottom_arrow="⮟";
+
+    symbol="─";
+    for((i=0;i<=length;i++))
+    do
+        printf "%s" $symbol;
+    done
+    printf "\n";
+}
+
+# The main driver function
+main(){
+    case "$1" in
+        "box") box $2 $3;;
+        "v_line") v_line $2;;
+        "h_line") h_line $2;;
+        * ) printf "Not a valid shape use any of these :- box, v_line";;
+    esac
+}
+# Driver function call
+main $@
